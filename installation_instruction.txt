@@ -1,0 +1,95 @@
+
+sudo apt-get update
+
+#check kernel (4.18.0-15-generic)
+uname -r
+
+sudo apt-get remove docker docker-engine docker.io containerd run criu
+
+#Docker
+sudo apt-get install docker.io
+
+#Install CRIU
+sudo apt-get update && sudo apt-get install -y protobuf-c-compiler libprotobuf-c0-dev protobuf-compiler libprotobuf-dev:amd64 gcc build-essential bsdmainutils python git-core asciidoc make htop git curl supervisor cgroup-lite libapparmor-dev libseccomp-dev libprotobuf-dev libprotobuf-c0-dev protobuf-c-compiler protobuf-compiler python-protobuf libnl-3-dev libcap-dev libaio-dev apparmor libnet-dev
+
+git clone https://github.com/xemul/criu criu
+
+cd criu
+sudo make clean
+sudo make 
+sudo make install
+
+#Then check if your criu works well
+sudo criu check
+sudo criu check --all
+# You will see 'looks good'
+
+
+#nfs
+    Downloading and Installing the Components
+    On the host:
+
+$ sudo apt-get update
+$ sudo apt-get install nfs-kernel-server
+
+    On the client:
+
+$ sudo apt-get update
+$ sudo apt-get install nfs-common
+
+We export the host's /home directory. Since it already exists, we don’t need to create it.
+
+    Configuring the NFS Exports on the Host Server
+
+$ sudo nano /etc/exports
+# Add the below line to exports file:
+/home       129.59.1.2(rw,sync,no_root_squash,no_subtree_check)
+# Then restart nfs-kernel-server service
+$ sudo systemctl restart nfs-kernel-server
+
+    Adjusting the Firewall on the Host
+
+# First, check firewall status
+$ sudo ufw status
+# If ufw is inactive, use the below command to enable ufw:
+$ sudo ufw enable
+# Make ufw allow incoming and outgoing:
+$ sudo ufw default allow incoming
+$ sudo ufw default allow outgoing
+# Make client server can access host server
+$ sudo ufw allow from 129.59.1.2 to any port nfs
+# Check ufw status
+$ sudo ufw status numbered
+
+    Creating the Mount Points on the Clients
+
+$ sudo mkdir -p /nfs/home
+
+    Mounting the Directory on the Client
+
+sudo mount 129.59.1.1:/home /nfs/home
+
+    Checking the Mounted Directory on the Client
+
+$ df -h
+
+
+
+
+sudo mkdir -p /runc/containers/xonotic/rootfs
+
+cd /runc/containers/xonotic
+
+sudo docker pull zaephor/xonotic-server
+
+sudo docker run -p 26000:26000 zaephor/xonotic-server
+
+#find container id
+sudo docker ps
+sudo docker export container_id -o xonotic.tar
+
+#extract tar into rootfs
+sudo tar -xvf xonotic.tar -C rootfs
+
+#copy config.json from where you have cloned
+cp /home/shivam/Desktop/Major-Project-master/config.json .s

@@ -1,0 +1,9 @@
+[Unit]
+Description=Migration Server
+
+[Service]
+Environment=PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
+ExecStart=/home/shivam/Desktop/Container Migration/Migration-tool/migrate-server.py
+
+[Install]
+WantedBy=multi-user.target
